@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <title>online-shopping-cart</title>
+    <script type="text/javascript">
+
+var collections = {
+                "first" : "friendly 24*7 customer support",
+                "second": " we return money within 30 days",
+               
+            }
+        var count = 1;
+       function previousclick(){
+       var statement = document.getElementById("statement");
+       statement.innerHTML = `${collections.first}`;
+    }
+    function nextclick(){
+       var statement = document.getElementById("statement");
+       statement.innerHTML = `${collections.second}`;
+    }
+    function loadcategories(){
+        $.ajax({
+            method : "get",
+            url : "http://fakestoreapi.com/products/categories",
+            success: (categories)=>{
+                categories.unshift("searchproduct");
+                $.each(categories,(property,value)=>{
+                    $(`<option value=${value}>${value.toUpperCase()}</option>`).appendTo("#search")
+                })
+            }
+        })
+    }
+
+    function loadproduct(url){
+        $("#mainarea").html("");
+        $.ajax({
+            method: "get",
+            url : url,
+            success: (products)=>{
+                $.each(products,(property,product)=>{
+                    $(`<div class="card mt-2 p-3 ms-4" style="width:400px;">
+                         <img src=${product.image} class="card-img-top" height="140px">
+                           <div class="card-header" style="height:130px">
+                              <p>${product.title}</p>
+                           </div>
+                           <div class= "card-body">
+                                <dl>
+                                    <dt>price</dt>
+                                    <dd>&#8377;${product.price}</dd>
+                                    <dt>rating</dt>
+                                    <dd><span><i class="bi bi-star text-warning"></i></span>
+                                        <span><i class="bi bi-star text-warning"></i></span>
+                                        <span><i class="bi bi-star text-warning"></i></span>
+                                        <span><i class="bi bi-star text-warning"></i></span>
+                                        ${product.rating.rate} [${product.rating.count}]</dd>
+                                </dl>
+                            </div>
+                           <div class="card-footer"> 
+                               <button id="addbtn" value=${product.title} class="btn btn-danger w-100" >add to cart</button>                               
+                           </div>
+                       </div>
+                    `).appendTo("#mainarea");
+                })
+            }
+        })
+    }
+
+
+        var cartitem = [];
+       function cartitemcount(){
+        document.getElementById("lblcount").innerHTML = cartitem.length;
+      }
+       
+      
+
+      function showcartitem(){
+        document.querySelector("tbody").innerHTML="";
+           fetch(`http://fakestoreapi.com/products`)
+           .then(function(response){
+                 return response.json();
+           })
+           .then(function (products){
+            for(var item of products){
+            var tr = document.createElement("tr");
+            var tdname = document.createElement("td");
+            var tdprice = document.createElement("td");
+            var tdreview = document.createElement("td");
+
+            tdname.innerHTML = item.title;
+            tdprice.innerHTML = item.price;
+            tdreview.innerHTML = `<img src=${item.image} width="70px" height="50px">`;
+
+            tr.appendChild(tdname);
+            tr.appendChild(tdprice);
+            tr.appendChild(tdreview);
+            document.querySelector("tbody").appendChild(tr);
+        }
+           })  
+    }
+      
+
+
+       $(()=>{
+
+
+        $("#support").click(function(){
+            confirm("OPEN PICK UP AN APP? \n always allow shopping cart to open in some certified app");
+        });
+
+        $("#countrychange").change(function(){
+            var img = document.getElementById("countryimage");
+            var country = $("#countrychange").val()
+
+          switch(country){
+            case  "INDIA": 
+            img.src="./images/india.png";
+            break;
+
+            case "USA" :
+                img.src="./images/us.png";
+                break;
+
+            case "UK":
+                img.src="./images/uk.png";
+                break;
+         
+
+            
+          }
+        })
+       $("#previousclick").click(function(){
+        count--;
+        previousclick(count);
+       })
+
+       $("#nextclick").click(function(){
+        count++;
+        nextclick(count);
+       })
+
+       loadcategories();
+       loadproduct("http://fakestoreapi.com/products");
+       
+
+       $("#search").change(function(e){
+        if(e.target.value=="searchproduct"){
+            loadproduct("http://fakestoreapi.com/products");
+        }  else{
+            loadproduct(`http://fakestoreapi.com/products/category/${e.target.value}`)
+        }
+        
+       })
+       
+
+      $(document).on("click","#addbtn",function(e){
+         
+                cartitem.push(e.target.value);
+                alert(`${e.target.value}  \n added to cart`)
+                cartitemcount();
+                showcartitem();
+
+           
+       })
+
+ 
+    $("#jewelery").click(function(e){
+        $("#search").val();
+        if(e.target.value=="searchproduct"){
+            loadproduct("http://fakestoreapi.com/products");
+        }  else{
+            loadproduct(`http://fakestoreapi.com/products/category/${e.target.value}`)
+        }
+    })
+
+
+       $("#department").mouseover(function(){
+        $("#department").css("display","block");
+       })
+
+       $("#instagram").click(function(){
+        location.href="https://www.instagram.com/";
+       })
+
+
+       $("#fashionblog").click(function(){
+         location.href="https://influencermarketinghub.com/best-fashion-blogs/";
+       })
+
+       $("#subscribe").click(function(){
+        var email = $("#email").val();
+        if(email==""){
+            alert("please enter your email id");
+
+        } else{
+            location.href="https://www.google.com/intl/en_in/gmail/about/";
+        }
+       })
+
+       $("#apple").click(function(){
+        location.href="https://www.apple.com/in/app-store/";
+       })
+       $("#google").click(function(){
+        location.href="https://play.google.com/store/apps?utm_source=apac_med&utm_medium=hasem&utm_content=Oct0121&utm_campaign=Evergreen&pcampaignid=MKT-EDR-apac-in-1003227-med-hasem-ap-Evergreen-Oct0121-Text_Search_BKWS-BKWS%7CONSEM_kwid_43700064490253544_creativeid_480915691381_device_c&gclid=CjwKCAjwvJyjBhApEiwAWz2nLbQcRK3GPfEbmfHxKm8CnsRhKSgf6oZz8FT9jt3rfHroOOMPE-_y1xoCDsgQAvD_BwE&gclsrc=aw.ds&pli=1"
+       })
+
+       $("#facebook").click(function(){
+        location.href="https://www.facebook.com/";
+       })
+       $("#twitter").click(function(){
+        location.href="https://twitter.com/i/flow/login";
+       })
+       $("#wattsapp").click(function(){
+        location.href="https://www.whatsapp.com/";
+       })
+       $("#youtube").click(function(){
+        location.href="https://www.youtube.com/ ";
+       })
+
+      function loadpage(PageName){
+        $.ajax({
+            method : "get",
+            url : PageName,
+            success : (data)=>{
+                $("section").html(data);
+            }
+        })
+      }
+
+      $("#tracking").click(function(){
+        loadpage("tracking.html");
+      })
+
+
+    })
+    </script>
+    <style>
+         #id{
+            position: sticky;
+            
+        }
+        .cardup{
+            margin-top: -150px;
+            margin-left: 20px;
+        }
+        .imgfloat{
+            float: right;
+            margin-top: -150px;
+        }
+        #shopbtn{
+            margin-left: 100px;
+        }
+        a{
+            text-decoration: none;
+        }
+        A:visited{
+            color: coral;
+        }
+    </style>
+</head>
+<body class="container-fluid">
+    <div class="d-flex justify-content-evenly mt-2 p-3 bg-dark text-white" id="div1">
+        <div>
+            <h5><span><i class="bi bi-headset text-success"></i></span><span  class="me-2">support <a id="support" href="">[00] 11 222 333</a></span> </h5>
+        </div>
+        <div>
+            <h4>
+            <span id="previousclick"><i class="bi bi-chevron-left text-success"></i></span>
+            <span id="statement" class="me-2">free shipping in order over 300 rupees</span>
+            <span id="nextclick"><i class="bi bi-chevron-right text-success"></i></span></h4>
+        </div>
+        <div class="d-flex">
+            <div><button class="btn text-primary " id="tracking" > <span><i class="bi bi-geo-alt-fill text-success"></i></span>order tracking</button></div>
+            <div class="ms-4 input-group ">
+                <div>
+                    <img width="50px" height="40px" id="countryimage" class="input-group-text" src="./images/india.png">
+                </div>
+                <div class="">
+                    <select id="countrychange" class="form-select bg-dark text-primary">
+                        <option>INDIA </option>
+                        <option>USA</option>
+                        <option>UK </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <header class="p-2">
+        <div class="row p-2">
+            <div class="col-2 ">
+                <img src="./images/shopper.png" width="100%">
+            </div>
+            <div class="col-6">
+                <div class="input-group">
+                    <select class="form-control" id="search">
+
+                    </select>
+                    <span class="input-group-text text-primary"><i class="bi bi-search"></i></span>
+                </div>
+                
+
+            </div>
+            <div class="col-4 ">
+                <div>
+                    <span>
+                        <button class="btn" id="signin">
+                            <span><i class="bi bi-person"></i></span>my account
+                            
+                        </button>
+                    </span>
+
+                    <span class="position-relative ms-2">
+                        <a href="#cart" data-bs-toggle="modal"  style="text-decoration: none;">
+                            <span><i class="bi bi-cart-fill"></i></span>
+                            <span class="badge bg-danger rounded rounded-circle position-absolute" id="lblcount"></span>
+                            my cart  &#8377;
+                        </a>
+                    </span>
+                    <div class="modal fade" id="cart">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2>product details</h2>
+                                    <button class="btn-close" data-bs-dismiss="modal" ></button>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>name</th>
+                                                <th>price</th>
+                                                <th>review</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <div class="ms-4 mt-3 p-3" id="department">
+            <div class="d-flex ms-4">
+                <div class="dropdown ms-4">
+                    <button class="btn dropdown-toggle" data-bs-toggle="dropdown"><span><i class="bi bi-app text-success "></i></span>
+                        department
+                    </button>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-item d-flex" >
+                            
+                            <div class="dropdown-item-text ">
+                              
+                                <img src="./images/menclothes.jpg" width="100px" height="50px" id="menclothes">
+                                
+                                <h4 class=" mt-2">men clothes</h4>
+                            </div>
+                            <div class="dropdown-item-text ">
+                             
+                                <img src="./images/womenclothes.jpg" width="100px" height="50px" id="womenclothes">
+                                
+                                <h4 class=" mt-2">women's clothes</h4>
+                            </div>
+                        
+                        </div>
+                        <div class="dropdown-divider">
+
+                        </div>
+                        <div class="dropdown-item d-flex" >
+                            <div class="dropdown-item-text ">
+                             
+                                <img src="./images/jewelery.jpg" width="100px" height="50px" id="jewelery">
+                                
+                                <h4 class=" mt-2">gold & jewelery</h4>
+                            </div>
+                            <div class="dropdown-item-text ms-2">
+                              
+                                <img src="./images/electronics.jpg" width="100px" height="50px" id="electronics">
+                               
+                                <h4 class=" mt-2">electronics</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown ms-4" id="home">
+                    <button class="dropdown-toggle btn " data-bs-toggle="dropdown">
+                       home 
+                    </button>
+                    <ol class="dropdown-menu">
+                        <li class="dropdown-item"><span class="dropdown-item-text">NFT market place</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text">fashion stores</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text">grocery  stores</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text"> market place</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text">electronics place</span></li>
+                    </ol>
+                </div>
+                <div class="dropdown ms-4" id="account">
+                    <button class="dropdown-toggle btn" data-bs-toggle="dropdown">
+                       account
+                    </button>
+                    <ol class="dropdown-menu">
+                        <li class="dropdown-item"><span class="dropdown-item-text">NFT market place</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text">shop user account</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text">shopper dashbord</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text"> market place</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text">password recovery</span></li>
+                    </ol>
+                </div>
+                <div class="dropdown ms-4" id="pages">
+                    <button class="dropdown-toggle btn" data-bs-toggle="dropdown">
+                       pages
+                    </button>
+                    <ol class="dropdown-menu">
+                        <li class="dropdown-item"><span class="dropdown-item-text">nav bar varient</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text">about us</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text">contact us</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text"> help center</span></li>
+                       
+                    </ol>
+                </div>
+                <div class="dropdown ms-4" id="blog">
+                    <button class="dropdown-toggle btn " data-bs-toggle="dropdown">
+                       blog
+                    </button>
+                    <ol class="dropdown-menu">
+                        <li class="dropdown-item"><span class="dropdown-item-text">blog list layout</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text">blog grid layout</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text">blog post layout</span></li>
+                       
+                       
+                    </ol>
+                </div>
+                <div class="dropdown ms-4" id="doc">
+                    <button class="dropdown-toggle btn" data-bs-toggle="dropdown">
+                       doc / component
+                    </button>
+                    <ol class="dropdown-menu">
+                        <li class="dropdown-item"><span class="dropdown-item-text">documentation</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text">component</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text">changelog</span></li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item"><span class="dropdown-item-text">support</span></li>
+                       
+                       
+                    </ol>
+                </div>
+            </div>
+            
+        </div>
+       
+    </header>
+    <section>
+        <div class="carousel slide carousel-dark" id="banner" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div id="banner3"></div>
+                    <img src="./images/banner1.jpg" width="100%" height="600px" class="d-block">
+                </div>
+                <div class="carousel-item ">
+                    <div id="banner2"></div>
+                    <img src="./images/banner2.jpg" width="100%" height="600px" class="d-block">
+                </div>
+                <div class="carousel-item ">
+                    <div id="banner3"></div>
+                    <img src="./images/banner3.jpg" width="100%" height="600px" class="d-block">
+                </div>
+            </div>
+            <button data-bs-slide="prev" data-bs-target="#banner" class="carousel-control-prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button data-bs-slide="next" data-bs-target="#banner" class="carousel-control-next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+           
+        </div>
+        <div class="cardup" style="width: 1000px;">
+            <div class="d-flex p-3 " id="menclothes1">
+                <div class="card p-4" id="menclothes">
+                    
+                    <img src="./images/menclothes.jpg" width="70px" height="200px" class="card-img-top">
+                    <p class="card-title"> men's clothes</p>
+                </div>
+                <div class="card  p-4" id="electronics">
+                    
+                    <img src="./images/electronics.jpg" width="70px" height="200px" class="card-img-top">
+                    <p class="card-title"> electronics</p>
+                </div>
+                <div class="card p-4" id="jewelery">
+                  
+                    <img src="./images/jewelery.jpg" width="70px" height="200px" class="card-img-top">
+                    <p class="card-title">jewelery </p>
+                </div>
+            </div>
+        </div>
+        <div class="row ms-3">
+            <div class="col-12 d-flex justify-content-center align-items-center ">
+                <h2><i>Trending Product</i></h2>
+            </div>
+            <div class="col-12 d-flex flex-wrap ms-4 overflow-auto" style="height:800px" id="mainarea">
+                
+            </div>
+            
+
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-7 ">
+                <div style="height: 350px;" class="border border-2 p-4">
+                    <div class="mt-4 p-2">
+                        <p mt-4><h4>Hurry up! Limited time offer</h4></p>
+                        <h1 class="text-primary mt-4 bg-light">Converse All Star on Sale</h1>
+                        <h3>
+                            <button class="btn btn-danger p-2 mt-4" id="shopbtn" data-bs-toggle="modal" data-bs-target="#btnmodal">shop now</button>
+                        </h3>
+                        <div class="modal fade" id="btnmodal" >
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h2><span><i class="bi bi-person me-2"></i></span>fill the registration form</h2>
+                                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <dl>
+                                            <dt>name</dt>
+                                            <dd><input type="text" class="form-control" name="username" ></dd>
+                                            <dt>date of birth</dt>
+                                            <dd><input type="date" class="form-control" name="date of birth" ></dd>
+                                            <dt>address</dt>
+                                            <dd><input type="text" class="form-control" name="address" ></dd>
+                                        </dl>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-danger" data-bs-dismiss="modal">submit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <img src="./images/shoes.jpg" class="imgfloat">
+                </div>
+            </div>
+            <div class="col-5">
+                <div style="height: 350px;" class="p-4 border border-2">
+                    <h1 class="mt-4 ms-4">Your Add Banner Here</h1>
+                    <h5 class="mt-4 ms-4">Hurry up to reserve your spot</h5>
+                    <h3 class="ms-4 ">
+                        <button class="btn btn-danger mt-4 ms-4 " id="contactbtn" data-bs-target="#btncontact" data-bs-toggle="modal" >contact us</button>
+                    </h3>
+                    <div class="modal fade" id="btncontact" >
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2><span><i class="bi bi-person me-2"></i></span>fill the registration form</h2>
+                                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <dl>
+                                        <dt>name</dt>
+                                        <dd><input type="text" class="form-control" name="username" ></dd>
+                                        <dt>date of birth</dt>
+                                        <dd><input type="date" class="form-control" name="date of birth" ></dd>
+                                        <dt>address</dt>
+                                        <dd><input type="text" class="form-control" name="address" ></dd>
+                                    </dl>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-danger" data-bs-dismiss="modal">submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4 ms-2">
+            <div class="col-5 border border-2 mt-2 p-2" style="height: 900px;">
+                <h2 class="text-danger">HOODIE DAY</h2>
+                <img src="./images/hoodie.jpg" height="90%" width="90%">
+            </div>
+            <div class="col-7 d-flex flex-wrap" >
+                <div class="card " style="width: 250px; height: 250px">
+                    <img src="./images/hd1.jpg" class="card-img-top">
+                    <div class="card-header">
+                        <h5>hoodie & sweatshirt</h5>
+                    </div>
+                    <div class="card-body">
+                        <h4>block-colored headed top</h4>
+                    </div>
+                    <div class="card-footer d-flex">
+                        <div> <h6>&#8377;400</h6></div>
+                        <div>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card " style="width: 250px; height: 250px">
+                    <img src="./images/hd2.jpg" class="card-img-top">
+                    <div class="card-header">
+                        <h5>hoodie & sweatshirt</h5>
+                    </div>
+                    <div class="card-body">
+                        <h4>block-colored headed top</h4>
+                    </div>
+                    <div class="card-footer d-flex">
+                        <div> <h6>&#8377;500</h6></div>
+                        <div>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card " style="width: 250px; height: 250px;">
+                    <img src="./images/hd3.jpg" class="card-img-top">
+                    <div class="card-header">
+                        <h5>hoodie & sweatshirt</h5>
+                    </div>
+                    <div class="card-body">
+                        <h4>block-colored headed top</h4>
+                    </div>
+                    <div class="card-footer d-flex">
+                        <div> <h6>&#8377;300</h6></div>
+                        <div>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card " style="width: 250px; height: 250px">
+                    <img src="./images/hd5.jpg" class="card-img-top">
+                    <div class="card-header">
+                        <h5>hoodie & sweatshirt</h5>
+                    </div>
+                    <div class="card-body">
+                        <h4>block-colored headed top</h4>
+                    </div>
+                    <div class="card-footer d-flex">
+                        <div> <h6>&#8377;400</h6></div>
+                        <div>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card " style="width: 250px; height: 250px">
+                    <img src="./images/hd4.jpg" class="card-img-top">
+                    <div class="card-header">
+                        <h5>hoodie & sweatshirt</h5>
+                    </div>
+                    <div class="card-body">
+                        <h4>block-colored headed top</h4>
+                    </div>
+                    <div class="card-footer d-flex">
+                        <div> <h6>&#8377;600</h6></div>
+                        <div>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card " style="width: 250px; height: 250px">
+                    <img src="./images/hd6.jpg" class="card-img-top">
+                    <div class="card-header">
+                        <h5>hoodie & sweatshirt</h5>
+                    </div>
+                    <div class="card-body">
+                        <h4>block-colored headed top</h4>
+                    </div>
+                    <div class="card-footer d-flex">
+                        <div> <h6>&#8377;450</h6></div>
+                        <div>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                            <span><i class="bi bi-star text-warning"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row ms-4 mt-4">
+            <div class="col-12 text-center mt-4">
+                <h1>shop by brand</h1>
+            </div>
+            <div class="col-12 d-flex flex-wrap mt-4 ms-4">
+                <div class="card">
+                    <img src="./images/addidas.png" class="card-img-top">
+                </div>
+                <div class="card ms-3">
+                    <img src="./images/nike.png" class="card-img-top">
+                </div>
+                <div class="card ms-3">
+                    <img src="./images/fils.png" class="card-img-top">
+                </div>
+                <div class="card ms-3 ">
+                    <img src="./images/american.png" class="card-img-top">
+                </div>
+                <div class="card mt-4">
+                    <img src="./images/brook.png" class="card-img-top">
+                </div>
+                <div class="card ms-3 mt-4">
+                    <img src="./images/dior.png" class="card-img-top">
+                </div>
+                <div class="card ms-3 mt-4 ">
+                    <img src="./images/colum.png" class="card-img-top">
+                </div>
+                <div class="card ms-3 mt-4">
+                    <img src="./images/ray.png" class="card-img-top">
+                </div>
+                <div class="card mt-4">
+                    <img src="./images/hermes.png" class="card-img-top">
+                </div>
+                <div class="card ms-3 mt-4 ">
+                    <img src="./images/nb.png" class="card-img-top">
+                </div>
+                <div class="card ms-3 mt-4">
+                    <img src="./images/puma.png" class="card-img-top">
+                </div>
+                <div class="card ms-3 mt-4">
+                    <img src="./images/tommy.png" class="card-img-top">
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-6 mt-4 d-flex justify-content-center align-items-center bg-warning"  id="fashionblog" style="height: 250px;" >
+                <div>
+                    <h3 class="ms-4">
+                        <i class="bi bi-chat-left-text ms-4 text-danger"></i>
+                    </h3>
+                    <h2>read the blog</h2>
+                    <h5>latest fashion ,store,news and articles</h5>
+                </div> 
+            </div>
+            <div class="col-6 mt-4 d-flex justify-content-center align-items-center bg-success" style="height: 250px;" id="instagram">
+                <div>
+                    <h3 class="ms-4">
+                        <i class="bi bi-instagram ms-4 text-danger"></i>
+                    </h3>
+                    <h2>follow on instagram</h2>
+                    <h5>#shopwithshopper</h5>
+                </div> 
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="row text-white bg-dark " id="emailblock">
+            <div class="col-4">
+                <ol style="list-style: none;" class="mt-2">
+                    <li><h3>shop department</h3></li>
+                    <li  ><h6><a href="#">jewelery</a></h6></li>
+                    <li  ><h6><a href="#j">electronics</a></h6></li>
+                    <li ><h6><a href="#">mens fashion</a></h6></li>
+                    <li  ><h6><a href="#">jwomen fashion</a></h6></li>
+                    <li  > <h6><a href="#">hoodie</a></h6></li>
+                    <li ><h6><a href="#">grocery</a></h6></li>
+                </ol>
+            </div>
+            <div class="col-4">
+                <ol style="list-style: none; " class="mt-2">
+                    <li  ><h3>about us</h3></li>
+                    <li  ><h6><a href="#">company</a></h6></li>
+                    <li  ><h6><a href="#">our team</a></h6></li>
+                    <li  ><h6><a href="#">careers</a></h6></li>
+                    <li > <h6><a href="#">news</a></h6></li>
+                 
+                </ol>
+            </div>
+            <div class="col-4">
+                <div class="input-group mt-4">
+                    <span class="mt-4">
+                        <input type="text" name="email" id="email" placeholder="your email" class="form-control w-100">
+                    </span>
+                    <button class="btn btn-danger input-group-text mt-4" id="subscribe">subscribe</button>
+                </div>
+                <div class="d-flex mt-4">
+                    <div>
+                        <img src="./images/apple.png" id="apple" width="150px" >
+                    </div>
+                    <div>
+                        <img src="./images/google.png" id="google" width="150px">
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="row bg-dark text-white" style="height: 150px;">
+            <div class="col-3 d-flex mt-4">
+                <div class="mt-3">
+                    <h2><i class="bi bi-rocket-takeoff mt-4 text-danger"></i></h2>
+                </div>
+                <div class="ms-3">
+                    <h3> fast and free delivery</h3>
+                    <h6>free delivery for all order over &#8377; 400</h6>
+                </div>
+            </div>
+            <div class="col-3 d-flex mt-4">
+                <div class="mt-3">
+                    <h2><i class="bi bi-coin mt-4 text-danger"></i></h2>
+                </div>
+                <div class="ms-3">
+                    <h3> money back guarantee</h3>
+                    <h6>we return money within 30 days </h6>
+                </div>
+            </div>
+            <div class="col-3 d-flex mt-4">
+                <div class="mt-3">
+                    <h2><i class="bi bi-headset mt-3 text-danger"></i></h2>
+                </div>
+                <div class="ms-3">
+                    <h3>24*7 customer service</h3>
+                    <h6>friendly 24*7 customer support</h6>
+                </div>
+            </div>
+            <div class="col-3 d-flex mt-4">
+                <div class="">
+                    <h2><i class="bi bi-facebook ms-3 text-danger" id="facebook"></i></h2>
+                </div>
+                <div class="">
+                    <h2><i class="bi bi-whatsapp ms-3 text-danger" id="wattsapp"></i></h2>
+                </div>
+                <div class="">
+                    <h2><i class="bi bi-twitter ms-3 text-danger" id="twitter"></i></h2>
+                </div>
+                <div class="">
+                    <h2><i class="bi bi-youtube ms-3 text-danger" id="youtube"></i></h2>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+</body>
+</html>
